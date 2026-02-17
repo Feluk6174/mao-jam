@@ -21,6 +21,8 @@ class StratExample(Strategy):
                 for card in self.player.cards:
                     if card != top_card and card.can_be_played(top_card):
                         return top_card
+                    else:
+                        return None
             return None
 
     def pick_play_card(self, top_card: BaseCard, direction: int, value_7: int) -> BaseCard | bool:
