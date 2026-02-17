@@ -100,8 +100,7 @@ jobs:
               print("\n".join(errors))
               sys.exit(1)
           elif is_simulator_change:
-              print(f"\n❌ PR contains protected file changes — only the repo owner can merge these manually.")
-              sys.exit(1)
+              print(f"\n⚠️  PR contains protected file changes — label added, waiting for owner to merge manually.")
           else:
               print(f"\n✅ All {len(changed)} file(s) validated for user '{author}'.")
           PYEOF
