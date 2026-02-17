@@ -93,12 +93,13 @@ def pausa(
     direction: int,
     pauses: list[list[int]],
     num_cards_per_player: list[int],
+    value_7: int,
 ) -> tuple[Deck, Deck]:
     log.debug(f"Iter {iter_number}: Entrem a la pausa!")
     to_append = num_cards_per_player.copy()
     for i in range(n):
         while num_cards_per_player[i] > 5:
-            card_to_discard = strategies[i].discard_card(top_card, current_player, direction)
+            card_to_discard = strategies[i].discard_card(top_card, current_player, direction, value_7)
             discard_pile.add_card(card_to_discard)
             players[i].remove_card(card_to_discard)
             num_cards_per_player[i] -= 1
@@ -114,7 +115,7 @@ def run_simulation(
     num_decks: int,
     build_deck: Callable[[Deck, int], None],
     strategies_to_call: list[type[Strategy]],
-    ignore_wrong_cards: bool = False,
+    log_ignores_wrong_cards: bool = False,
 ) -> None:
     debug_mode = iter_max == 1
     t0 = time.perf_counter()
@@ -169,9 +170,9 @@ def run_simulation(
                     num_cards_per_player[i] += 1
             top_card = main_pile.remove_top_card()
             has_winner = False
-            current_player = 0
+            current_player = random.randint(0, n-1) # Could have some "first player" advantage.
             direction = 1
-            increment_7 = 0
+            value_7 = 0
             log.debug(f"Top card: {top_card}")
 
             while not has_winner:
@@ -206,10 +207,10 @@ def run_simulation(
                 current_prob[1] += 1
 
                 strategy = strategies[current_player]
-                played_card = strategy.pick_play_card(top_card, direction)
+                played_card = strategy.pick_play_card(top_card, direction, value_7)
                 if type(played_card) is not bool:
                     if not played_card.can_be_played(top_card):
-                        (log.debug if ignore_wrong_cards else log.error)(
+                        (log.debug if log_ignores_wrong_cards else log.error)(
                             f"Iter {iter_number}: Player {current_player} ha jugat malament! "
                             f"{str(played_card)} no pot jugar! "
                             f"({current_hand_size} -> {current_hand_size + 1})",
@@ -229,18 +230,18 @@ def run_simulation(
                     if top_card.value == 10:
                         direction *= -1
                     if top_card.value == 7:
-                        increment_7 += 1
-                        for _ in range(increment_7):
+                        value_7 += 1
+                        for _ in range(value_7):
                             players[current_player].add_card(main_pile.remove_top_card())
                             num_cards_per_player[current_player] += 1
                             if len(main_pile) == 0:
                                 break  # entrara en pausa automaticament
                         log.debug(
                             f"Iter {iter_number}: Player {current_player} ha robat per tirar el 7 "
-                            f"({current_hand_size - 1} -> {current_hand_size - 1 + increment_7})",
+                            f"({current_hand_size - 1} -> {current_hand_size - 1 + value_7})",
                         )
                     else:
-                        increment_7 = 0
+                        value_7 = 0
                 else:
                     players[current_player].add_card(main_pile.remove_top_card())
                     num_cards_per_player[current_player] += 1
@@ -260,11 +261,11 @@ def run_simulation(
 
                 random.shuffle(player_indexes)
                 for i in player_indexes:
-                    jump_card = strategies[i].pick_jump_card(top_card, current_player, direction)
+                    jump_card = strategies[i].pick_jump_card(top_card, current_player, direction, value_7)
                     if jump_card is not None:
                         jump_hand_size = num_cards_per_player[i]
                         if not jump_card.can_be_jumped(top_card):
-                            (log.debug if ignore_wrong_cards else log.error)(
+                            (log.debug if log_ignores_wrong_cards else log.error)(
                                 f"Iter {iter_number}: Player {i} ha saltat malament! "
                                 f"{str(jump_card)} no pot saltar! "
                                 f"({jump_hand_size} -> {jump_hand_size + 1})",
@@ -272,7 +273,7 @@ def run_simulation(
                             players[i].add_card(main_pile.remove_top_card())
                             num_cards_per_player[i] += 1
                             if len(main_pile) == 0:
-                                discard_pile, main_pile = pausa(log, iter_number, n, players, strategies, top_card, discard_pile, main_pile, current_player, direction, pauses, num_cards_per_player)
+                                discard_pile, main_pile = pausa(log, iter_number, n, players, strategies, top_card, discard_pile, main_pile, current_player, direction, pauses, num_cards_per_player, value_7)
                             continue
                         num_cards_per_player[i] -= 1
                         log.debug(f"Iter {iter_number}: Player {i} ha saltat amb {str(jump_card)} ({jump_hand_size} -> {jump_hand_size - 1})")

@@ -77,13 +77,14 @@ class Strategy(ABC):
         number_of_players: int,
         build_deck: Callable[[Deck, int], None],
         num_decks: int,
-        num_cards_per_player: list[int],
+        num_cards_per_player: list[int]
     ) -> None:
         """Base strategy class used to implement different player behaviours."""
         self.player: Deck = player
         self.player_index: int = player_index
         self.number_of_players: int = number_of_players
         self.discarded_pile: Deck = discard_pile
+        self.num_cards_per_player: list[int] = num_cards_per_player
         self.all_cards: Deck = Deck()
         self.build_deck: Callable[[Deck, int], None] = build_deck
         self.num_decks: int = num_decks
@@ -112,11 +113,12 @@ class Strategy(ABC):
         top_card: BaseCard,
         current_player: int,
         direction: int,
+        value_7: int,
     ) -> BaseCard | None:
         """Return the jump card to play, or None if no jump is played."""
 
     @abstractmethod
-    def pick_play_card(self, top_card: BaseCard, direction: int) -> BaseCard | bool:
+    def pick_play_card(self, top_card: BaseCard, direction: int, value_7: int) -> BaseCard | bool:
         """Return the regular card to play.
 
         Return False if none is playable, True if the player wants to skip the turn.
@@ -128,6 +130,7 @@ class Strategy(ABC):
         top_card: BaseCard,
         current_player: int,
         direction: int,
+        value_7: int,
     ) -> BaseCard:
         """Return the card to discard."""
 
@@ -137,10 +140,11 @@ class RandomStrategy(Strategy):
         top_card: BaseCard,
         current_player: int,
         direction: int,
+        value_7: int,
     ) -> BaseCard | None:
         return choice(self.player.cards)
 
-    def pick_play_card(self, top_card: BaseCard, direction: int) -> BaseCard | bool:
+    def pick_play_card(self, top_card: BaseCard, direction: int, value_7: int) -> BaseCard | bool:
         return choice(self.player.cards)
 
     def discard_card(
@@ -148,6 +152,7 @@ class RandomStrategy(Strategy):
         top_card: BaseCard,
         current_player: int,
         direction: int,
+        value_7: int,
     ) -> BaseCard:
         return choice(self.player.cards)
 
@@ -157,13 +162,14 @@ class FirstStrategy(Strategy):
         top_card: BaseCard,
         current_player: int,
         direction: int,
+        value_7: int,
     ) -> BaseCard | None:
         for card in self.player.cards:
             if card.can_be_jumped(top_card):
                 return card
         return None
 
-    def pick_play_card(self, top_card: BaseCard, direction: int) -> BaseCard | bool:
+    def pick_play_card(self, top_card: BaseCard, direction: int, value_7: int) -> BaseCard | bool:
         for card in self.player.cards:
             if card.can_be_played(top_card):
                 return card
@@ -174,5 +180,6 @@ class FirstStrategy(Strategy):
         top_card: BaseCard,
         current_player: int,
         direction: int,
+        value_7: int,
     ) -> BaseCard:
         return self.player.cards[0]
