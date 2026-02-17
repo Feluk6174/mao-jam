@@ -20,7 +20,7 @@ for i in range(2, len(strategies) + 1):
     for combination in combinations(strategies, i):
         run_simulation(
             n=i,
-            iter_max=int(1e3),
+            iter_max=int(1e5),
             num_decks=2,
             build_deck=build_deck,
             strategies_to_call=combination,

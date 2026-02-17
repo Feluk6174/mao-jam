@@ -116,6 +116,8 @@ def run_simulation(
     build_deck: Callable[[Deck, int], None],
     strategies_to_call: list[type[Strategy]],
     log_ignores_wrong_cards: bool = False,
+    random_first_player: bool = False,
+    random_position_players: bool = False # to be implemented!
 ) -> None:
     debug_mode = iter_max == 1
     t0 = time.perf_counter()
@@ -170,7 +172,10 @@ def run_simulation(
                     num_cards_per_player[i] += 1
             top_card = main_pile.remove_top_card()
             has_winner = False
-            current_player = random.randint(0, n-1) # Could have some "first player" advantage.
+            if random_first_player:
+                current_player = random.randint(0, n-1) # Could have some "first player" advantage.
+            else:
+                current_player = 0
             direction = 1
             value_7 = 0
             log.debug(f"Top card: {top_card}")
