@@ -107,7 +107,7 @@ jobs:
           PYEOF
 
       - name: Label as simulator change (needs review)
-        if: steps.validation.outputs.is_simulator_change == 'true'
+        if: always() && steps.validation.outputs.is_simulator_change == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
