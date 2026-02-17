@@ -15,6 +15,7 @@ base/extended_card_class.py
 
 !strategies/
 !strategies/**
+strategies/__pycache__/
 
 !scripts/
 !scripts/**
