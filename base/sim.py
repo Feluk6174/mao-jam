@@ -257,7 +257,7 @@ def run_simulation(
                 current_player = (current_player + direction) % n
 
                 if len(main_pile) == 0:
-                    discard_pile, main_pile = pausa(log, iter_number, n, players, strategies, top_card, discard_pile, main_pile, current_player, direction, pauses, num_cards_per_player)
+                    discard_pile, main_pile = pausa(log, iter_number, n, players, strategies, top_card, discard_pile, main_pile, current_player, direction, pauses, num_cards_per_player, value_7)
 
                 random.shuffle(player_indexes)
                 for i in player_indexes:
