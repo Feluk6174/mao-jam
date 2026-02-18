@@ -100,11 +100,13 @@ def pausa(
     for i in range(n):
         while num_cards_per_player[i] > 5:
             card_to_discard = strategies[i].discard_card(top_card, current_player, direction, value_7)
-            discard_pile.add_card(card_to_discard)
+            main_pile.add_card(card_to_discard) # canvi de discard_pile a main_pile per fer que no tinguin extra info de descartar la resta.
             players[i].remove_card(card_to_discard)
             num_cards_per_player[i] -= 1
             log.debug(f"Player {i} ha descartat {str(card_to_discard)}")
-    main_pile.shuffle()
+    while len(main_pile) > 0:
+        discard_pile.add_card(main_pile.remove_top_card())
+    discard_pile.shuffle()
     pauses.append(to_append)
     return main_pile, discard_pile
 
