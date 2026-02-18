@@ -24,7 +24,9 @@ for i in range(2, len(strategies) + 1):
             num_decks=2,
             build_deck=build_deck,
             strategies_to_call=combination,
-            log_ignores_wrong_cards=True
+            log_ignores_wrong_cards=True,
+            random_first_player=True,
+            random_position_players=True,
         )
         names = [strategy.__name__ for strategy in combination]
         file.write(f"Simulated combination: {' vs '.join(names)}\n")
