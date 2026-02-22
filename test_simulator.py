@@ -22,7 +22,7 @@ def build_deck(main_pile, num_decks: int):
 run_simulation(
     n=N,
     iter_max=int(1e6),
-    num_decks=1,
+    num_decks=2,
     build_deck=build_deck,
     strategies_to_call = [FElixSuper1] + [FirstStrategy] * (N-1),
 )
